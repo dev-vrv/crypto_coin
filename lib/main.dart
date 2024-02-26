@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 const Color dark = Color.fromARGB(255, 21, 21, 21);
 const Color white = Color.fromARGB(255, 255, 255, 255);
