@@ -1,76 +1,201 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+
+const Color dark = Color.fromARGB(255, 21, 21, 21);
+const Color white = Color.fromARGB(255, 255, 255, 255);
+const Color primary = Color.fromARGB(255, 243, 167, 68);
+
+const TextTheme appTextTheme = TextTheme(
+  bodyMedium: TextStyle(
+    color: white,
+    fontWeight: FontWeight.w300,
+    fontSize: 15,
+  ),
+  bodyLarge: TextStyle(
+    color: white,
+    fontWeight: FontWeight.w500,
+    fontSize: 18,
+  ),
+);
+
+const DividerThemeData appDividerTheme = DividerThemeData(
+  color: Color.fromARGB(255, 48, 48, 48),
+  thickness: 1,
+  space: 10,
+  indent: 10,
+  endIndent: 10,
+);
+
+const ListTileThemeData appListTileTheme = ListTileThemeData(iconColor: white);
+
+const AppBarTheme appBarTheme = AppBarTheme(
+  backgroundColor: dark,
+  foregroundColor: white,
+  titleTextStyle: TextStyle(
+    color: white,
+    fontWeight: FontWeight.w600,
+    fontSize: 20,
+  ),
+  centerTitle: true,
+  iconTheme: IconThemeData(color: white),
+);
+
+const List<String> walletNames = [
+  'Bitcoin',
+  'Ethereum',
+  'Ripple',
+  'Litecoin',
+  'Cardano',
+  'Polkadot',
+  'Bitcoin Cash',
+  'Chainlink',
+  'Stellar',
+  'USD Coin',
+  'Tether',
+  'Dogecoin',
+  'Binance Coin',
+  'Monero',
+  'Tron',
+  'EOS',
+  'NEM',
+];
+
+const Map<String, int> walletBalance = {
+  'Bitcoin': 10,
+  'Ethereum': 20,
+  'Ripple': 30,
+  'Litecoin': 40,
+  'Cardano': 40,
+  'Polkadot': 50,
+  'Bitcoin Cash': 60,
+  'Chainlink': 22,
+  'Stellar': 10,
+  'USD Coin': 20,
+  'Tether': 0,
+  'Dogecoin': 0,
+  'Binance Coin': 0,
+  'Monero': 0,
+  'Tron': 0,
+  'EOS': 0,
+  'NEM': 0,
+};
 
 void main() {
-  runApp(const TodoListApp());
+  runApp(const MyApp());
 }
 
-class TodoListApp extends StatelessWidget {
-  const TodoListApp({super.key});
-
-  // This widget is the root of your application.
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme:
-            ColorScheme.fromSeed(seedColor: Colors.greenAccent.shade400),
+        scaffoldBackgroundColor: dark,
+        primarySwatch: Colors.orange,
+        colorScheme: ColorScheme.fromSeed(seedColor: primary),
+        appBarTheme: appBarTheme,
+        textTheme: appTextTheme,
+        dividerTheme: appDividerTheme,
+        listTileTheme: appListTileTheme,
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Тополиный пух, Арсен петух'),
+      routes: {
+        '/list': (context) => const CryptoListScreen(),
+        '/coin': (context) => const CryptoCoinScreen(),
+      },
+      initialRoute: '/list',
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
+class CryptoListScreen extends StatefulWidget {
+  const CryptoListScreen({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<CryptoListScreen> createState() => _CryptoListScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 101;
+class _CryptoListScreenState extends State<CryptoListScreen> {
+  @override
+  Widget build(BuildContext context) {
+    final textMedium = Theme.of(context).textTheme.bodyMedium;
+    final textLarge = Theme.of(context).textTheme.bodyLarge;
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Crypto Wallets'),
+      ),
+      body: ListView.separated(
+          separatorBuilder: (context, index) => const Divider(),
+          itemBuilder: (context, index) {
+            return ListTile(
+              leading: Image.asset(
+                'assets/png/CRYPTO.png',
+                height: 50,
+                width: 50,
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              title: Text(
+                '${walletNames[index]} Wallet',
+                style: textLarge,
+              ),
+              subtitle: Text(
+                'Balance: ${walletBalance[walletNames[index]]}',
+                style: textMedium,
+              ),
+              onTap: () {
+                Navigator.pushNamed(context, '/coin', arguments: {
+                  'wallet': walletNames[index],
+                  'balance': walletBalance[walletNames[index]],
+                });
+              },
+            );
+          },
+          itemCount: walletNames.length),
+    );
+  }
+}
+
+class CryptoCoinScreen extends StatefulWidget {
+  const CryptoCoinScreen({super.key});
+
+  @override
+  State<CryptoCoinScreen> createState() => _CryptoCoinScreenState();
+}
+
+class _CryptoCoinScreenState extends State<CryptoCoinScreen> {
+  String? wallet;
+  int? balance;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)?.settings.arguments as Map;
+    wallet = args['wallet'];
+    balance = args['balance'];
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
+        appBar: AppBar(
+          title: Text(wallet as String),
+        ),
+        body: Center(
+            child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'Я решил увековечить инфу о том что ты',
+          children: [
+            Image.asset(
+              'assets/png/CRYPTO.png',
+              height: 100,
+              width: 100,
             ),
+            const SizedBox(height: 20),
             Text(
-              'на $_counter% чёрт',
-              style: Theme.of(context).textTheme.headlineMedium,
+              'Wallet Balance: $balance',
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
           ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+        )));
   }
 }
